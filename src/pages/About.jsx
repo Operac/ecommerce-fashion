@@ -209,7 +209,7 @@ const About = () => {
           <p className="text-xl text-gray-600 mb-8">
             Be part of a movement where style meets individuality. Start your fashion journey with us today.
           </p>
-          <Link to={"/newarrivals"} className="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-300 shadow-lg hover:shadow-xl">
+          <Link to={"/newarrivals"} className="bg-primary g text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-300 shadow-lg hover:shadow-xl">
             Shop Now
           </Link>
         </div>
