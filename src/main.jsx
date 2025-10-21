@@ -7,13 +7,13 @@ import Contact from './pages/Contact.jsx'
 import About from './pages/About.jsx'
 import Home from './pages/Home.jsx'
 import NewArrivals from './pages/NewArrivals.jsx'
-import MenCloths from './pages/Mencloths.jsx'
 import WomenCloths from './pages/WomenCloths.jsx'
 import ChildrenCloths from './pages/ChildrenCloths.jsx'
 import Cart from './pages/Cart.jsx'
 import ProductProvider, { ProductContext } from './Context/ProductContext.jsx'
 import Login from './pages/Login.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
+import MenCloths from './pages/MenCloths.jsx'
 
 
 const router = createBrowserRouter([
