@@ -1,0 +1,1 @@
+Each components folder e.g HomeComponents holds components that are rendered in its respective pageComponent e.g Home.jsx
