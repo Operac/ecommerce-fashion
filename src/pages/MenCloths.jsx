@@ -5,7 +5,7 @@ import { FcLike } from "react-icons/fc";
 import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
 
-const Men = () => {
+const MenCloths = () => {
   const { HandleGetProducts, productData, HandleAddTCart } = useContext(ProductContext);
   const [likedProducts, setLikedProducts] = useState([]);
   const [visibleCount, setVisibleCount] = useState(9);
@@ -295,4 +295,4 @@ const Men = () => {
   );
 };
 
-export default Men;
+export default MenCloths;
