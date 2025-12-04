@@ -1,7 +1,7 @@
-import { Link, Links, NavLink } from "react-router-dom";
+import { Link, Links, NavLink, useNavigate } from "react-router-dom";
 import { CiMenuFries, CiSearch } from "react-icons/ci";
 import { SlHandbag } from "react-icons/sl";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
 import { ProductContext } from "../../Context/ProductContext";
 
@@ -9,7 +9,34 @@ import { ProductContext } from "../../Context/ProductContext";
 
 const Navbar = () => {
 
-  const { cartCout } = useContext(ProductContext)
+  const { cartCout } = useContext(ProductContext);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+
+  // Load user data on component mount
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setUser(parsedUser);
+        console.log("✓ User data loaded from localStorage:", parsedUser);
+      } catch (error) {
+        console.error("Error parsing user data:", error);
+      }
+    }
+  }, []);
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userData");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userData");
+    setUser(null);
+    console.log("✓ User logged out successfully");
+    navigate("/login");
+  };
 
   const navlinks = [
     {
@@ -83,9 +110,27 @@ key={item.id}>{item.name}
   <CiSearch />
   </button>
 
-<Link to={"/login"} className="border-[1px] border-white bg-black p-[7px] text-sm hover:bg-white hover:text-black transition ease-in-out duration-300 rounded-3xl"> 
-<CgProfile /> 
-</Link>
+{user ? (
+  <div className="flex items-center gap-3">
+    <span className="text-white font-semibold">Welcome, {user.firstName || user.email}!</span>
+    <Link 
+      to="/order-history"
+      className="border-[1px] border-white bg-black px-3 py-1 text-sm hover:bg-blue-700 transition ease-in-out duration-300 rounded-3xl"
+    >
+      Order History
+    </Link>
+    <button 
+      onClick={handleLogout}
+      className="border-[1px] border-white bg-red-600 px-3 py-1 text-sm hover:bg-red-700 transition ease-in-out duration-300 rounded-3xl"
+    >
+      Logout
+    </button>
+  </div>
+) : (
+  <Link to={"/login"} className="border-[1px] border-white bg-black p-[7px] text-sm hover:bg-white hover:text-black transition ease-in-out duration-300 rounded-3xl"> 
+    <CgProfile /> 
+  </Link>
+)}
 
      {/* Search Input (Shared for all screens) */}
 {searchOpen && (
@@ -186,9 +231,26 @@ key={item.id}>{item.name}
 
 <div className="flex gap-4">
 
-<Link to={"/login"} className="border-[1px] border-white bg-black p-[7px] text-sm hover:bg-white hover:text-black transition ease-in-out duration-300 rounded-3xl"> 
-<CgProfile /> 
-</Link>
+{user ? (
+  <div className="flex gap-2">
+    <Link 
+      to="/order-history"
+      className="border-[1px] border-white bg-blue-600 px-2 py-1 text-xs hover:bg-blue-700 transition ease-in-out duration-300 rounded-3xl"
+    >
+      Orders
+    </Link>
+    <button 
+      onClick={handleLogout}
+      className="border-[1px] border-white bg-red-600 px-2 py-1 text-xs hover:bg-red-700 transition ease-in-out duration-300 rounded-3xl"
+    >
+      Logout
+    </button>
+  </div>
+) : (
+  <Link to={"/login"} className="border-[1px] border-white bg-black p-[7px] text-sm hover:bg-white hover:text-black transition ease-in-out duration-300 rounded-3xl"> 
+    <CgProfile /> 
+  </Link>
+)}
 
 <span onClick={()=> HandlMenuOpen()}
 className="flex justify-center items-center lg:hidden font-bold text-2xl">

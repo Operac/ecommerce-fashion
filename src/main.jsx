@@ -14,6 +14,11 @@ import ProductProvider, { ProductContext } from './Context/ProductContext.jsx'
 import Login from './pages/Login.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
 import MenCloths from './pages/MenCloths.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
+import VerifyPayment from './pages/VerifyPayment.jsx'
+import ThankYou from './pages/ThankYou.jsx'
+import Orders from './pages/Orders.jsx'
+import OrderHistory from './pages/OrderHistory.jsx'
 
 
 const router = createBrowserRouter([
@@ -60,6 +65,26 @@ const router = createBrowserRouter([
       {
         element: <SingleProduct />,
         path: "product/:id"
+      },
+      {
+        element: <AdminDashboard />,
+        path: "admin"
+      },
+            {
+        element: <VerifyPayment />,
+        path: "verifypayment"
+      },
+      {
+        element: <ThankYou />,
+        path: "thank-you"
+      },
+      {
+        element: <Orders />,
+        path: "orders"
+      },
+      {
+        element: <OrderHistory />,
+        path: "order-history"
       }
     ]
   }
