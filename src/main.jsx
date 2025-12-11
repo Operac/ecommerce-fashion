@@ -19,6 +19,7 @@ import VerifyPayment from './pages/VerifyPayment.jsx'
 import ThankYou from './pages/ThankYou.jsx'
 import Orders from './pages/Orders.jsx'
 import OrderHistory from './pages/OrderHistory.jsx'
+import VerifyEmail from './pages/VerifyEmail.jsx'
 
 
 const router = createBrowserRouter([
@@ -85,7 +86,11 @@ const router = createBrowserRouter([
       {
         element: <OrderHistory />,
         path: "order-history"
-      }
+      },
+                  {
+        element: <VerifyEmail />,
+        path: "verify-email"
+      },
     ]
   }
 ])

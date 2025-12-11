@@ -23,7 +23,11 @@ const MenCloths = () => {
   const menProducts = useMemo(() => {
     if (!Array.isArray(productData)) return [];
 
-    let filtered = productData.filter((item) => item.category === "men");
+    let filtered = productData.filter((item) => 
+      item.category?.toLowerCase() === "men" || 
+      item.category?.toLowerCase() === "male" ||
+      item.category?.toLowerCase() === "man"
+    );
 
     // Filter by subcategory
     if (selectedSubcategory !== "all") {

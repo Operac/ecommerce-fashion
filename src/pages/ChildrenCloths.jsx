@@ -22,7 +22,12 @@ const ChildrenCloths = () => {
   // Filter products for men category with subcategory and tag filters
 const childrenProducts = useMemo(() => {
   if (!Array.isArray(productData)) return [];
-  let filtered = productData.filter((item) => item.category === "children");
+  let filtered = productData.filter((item) => 
+    item.category?.toLowerCase() === "children" || 
+    item.category?.toLowerCase() === "child" ||
+    item.category?.toLowerCase() === "kids" ||
+    item.category?.toLowerCase() === "kid"
+  );
 
   // Filter by subcategory
   if (selectedSubcategory !== "all") {

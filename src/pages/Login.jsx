@@ -447,6 +447,7 @@ const Login = ({ onLoginSuccess }) => {
     confirmPassword: "",
     image: null,
   });
+  const [isVerificationPending, setIsVerificationPending] = useState(false);
 
   const navigate = useNavigate();
 
@@ -569,8 +570,8 @@ const Login = ({ onLoginSuccess }) => {
         const response = await registerUser(formData);
         
         if (response.ok) {
-          toast.success("Account created successfully! Please login.");
-          switchTab("login");
+          toast.success("Account created successfully! Please check your email.");
+           setIsVerificationPending(true);
         } else {
           toast.error(response.data?.message || "Registration failed");
         }
@@ -612,7 +613,7 @@ const Login = ({ onLoginSuccess }) => {
           </div>
 
           {/* Tab Navigation */}
-          {activeTab !== "forgot" && (
+          {activeTab !== "forgot" && !isVerificationPending && (
             <div className="flex gap-2 bg-gray-900 p-1 rounded-lg mb-2">
               <button
                 type="button"
@@ -641,8 +642,29 @@ const Login = ({ onLoginSuccess }) => {
             </div>
           )}
 
+          {/* Verification Pending Message */}
+          {isVerificationPending && (
+            <div className="text-center py-8">
+              <div className="bg-green-100 text-green-800 p-4 rounded-lg mb-6">
+                <p className="font-bold text-lg mb-2">Registration Successful!</p>
+                <p>We have sent a verification email to: <br/><strong>{userData.email}</strong></p>
+                <p className="mt-4 text-sm">Please check your email and click the link to verify your account.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                   setIsVerificationPending(false);
+                   switchTab("login");
+                }}
+                className="bg-white text-black font-bold py-3 px-8 rounded-md hover:bg-gray-100 transition-all duration-300 shadow-lg"
+              >
+                Go to Login
+              </button>
+            </div>
+          )}
+
           {/* Sign Up Form */}
-          {activeTab === "signup" && (
+          {activeTab === "signup" && !isVerificationPending && (
             <>
               <Input
                 type="text"
@@ -748,6 +770,7 @@ const Login = ({ onLoginSuccess }) => {
           )}
 
           {/* Submit Button */}
+          {!isVerificationPending && (
           <button
             type="submit"
             disabled={isSubmitting}
@@ -769,6 +792,7 @@ const Login = ({ onLoginSuccess }) => {
               </>
             )}
           </button>
+          )}
 
           {/* Forgot Password Link */}
           {activeTab === "login" && (
@@ -795,6 +819,7 @@ const Login = ({ onLoginSuccess }) => {
           )}
 
           {/* Additional Info */}
+          {!isVerificationPending && (
           <div className="mt-4 pt-4 border-t border-white">
             <p className="text-sm text-white text-center">
               {activeTab === "login" && "New customer? "}
@@ -812,6 +837,7 @@ const Login = ({ onLoginSuccess }) => {
               </span>
             </p>
           </div>
+          )}
         </form>
       </div>
     </Layout>

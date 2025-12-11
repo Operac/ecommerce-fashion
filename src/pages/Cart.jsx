@@ -247,7 +247,7 @@ const Cart = () => {
       };
       localStorage.setItem("lastOrder", JSON.stringify(orderData));
 
-      const res = await fetch(`${baseUrl}intializepayment`, {
+      const res = await fetch(`${baseUrl}initializepayment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
