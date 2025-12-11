@@ -20,6 +20,7 @@ import ThankYou from './pages/ThankYou.jsx'
 import Orders from './pages/Orders.jsx'
 import OrderHistory from './pages/OrderHistory.jsx'
 import VerifyEmail from './pages/VerifyEmail.jsx'
+import LikedProducts from './pages/LikedProducts.jsx'
 
 
 const router = createBrowserRouter([
