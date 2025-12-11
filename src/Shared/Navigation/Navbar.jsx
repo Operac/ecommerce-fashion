@@ -1,5 +1,6 @@
 import { Link, Links, NavLink, useNavigate } from "react-router-dom";
 import { CiMenuFries, CiSearch } from "react-icons/ci";
+import { FaHeart } from "react-icons/fa";
 import { SlHandbag } from "react-icons/sl";
 import { useContext, useState, useEffect } from "react";
 import { CgProfile } from "react-icons/cg";
@@ -148,6 +149,11 @@ key={item.id}>{item.name}
 </div>
 )}
 
+<span className="h-[27px] w-[27px] rounded-full flex items-center justify-center border-[1px] border-white mr-2">
+  <NavLink className={({isActive})=> (isActive? "border-[1px] bg-white text-black rounded-3xl p-[10px] text-sm":"p-[10px] rounded-3xl text-sm hover:bg-white hover:text-black transition ease-in-out duration-700")} 
+to="/liked-products"><FaHeart />
+</NavLink>
+</span>
 <span className="h-[27px] w-[27px] rounded-full flex items-center justify-center border-[1px] border-white">
   <NavLink className={({isActive})=> (isActive? "border-[1px] bg-white text-black rounded-3xl p-[10px] text-sm":"p-[10px] rounded-3xl text-sm hover:bg-white hover:text-black transition ease-in-out duration-700")} 
 to="/cart"><SlHandbag />

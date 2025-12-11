@@ -91,6 +91,10 @@ const router = createBrowserRouter([
         element: <VerifyEmail />,
         path: "verify-email"
       },
+      {
+        element: <LikedProducts />,
+        path: "liked-products"
+      },
     ]
   }
 ])

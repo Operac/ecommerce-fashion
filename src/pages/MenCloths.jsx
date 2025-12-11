@@ -6,8 +6,7 @@ import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
 
 const MenCloths = () => {
-  const { HandleGetProducts, productData, HandleAddTCart } = useContext(ProductContext);
-  const [likedProducts, setLikedProducts] = useState([]);
+  const { HandleGetProducts, productData, HandleAddTCart, likedProducts, handleToggleLike } = useContext(ProductContext);
   const [visibleCount, setVisibleCount] = useState(9);
   
   // Filter states
@@ -31,12 +30,16 @@ const MenCloths = () => {
 
     // Filter by subcategory
     if (selectedSubcategory !== "all") {
-      filtered = filtered.filter((item) => item.subcategory === selectedSubcategory);
+      filtered = filtered.filter((item) => 
+        item.subcategory?.toLowerCase().includes(selectedSubcategory.toLowerCase())
+      );
     }
 
     // Filter by tag
     if (selectedTag !== "all") {
-      filtered = filtered.filter((item) => item.tag === selectedTag);
+      filtered = filtered.filter((item) => 
+        item.tags?.includes(selectedTag) || item.tag === selectedTag
+      );
     }
 
     // Filter by search term
@@ -49,14 +52,7 @@ const MenCloths = () => {
     return filtered;
   }, [productData, selectedSubcategory, selectedTag, searchTerm]);
 
-  // Toggle like function
-  const handleToggleLike = (productId) => {
-    if (likedProducts.includes(productId)) {
-      setLikedProducts(likedProducts.filter((id) => id !== productId));
-    } else {
-      setLikedProducts([...likedProducts, productId]);
-    }
-  };
+
 
   // Handlers for See More/Less
   const handleSeeMore = () => {

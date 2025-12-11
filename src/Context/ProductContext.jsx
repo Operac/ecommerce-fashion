@@ -324,6 +324,90 @@ const ProductProvider = ({ children }) => {
     HandleGetProducts();
   }, [HandleGetProducts]);
 
+  // Wishlist State
+  const [likedProducts, setLikedProducts] = useState(() => {
+    try {
+      // Initialize from local storage for everyone first
+      return JSON.parse(localStorage.getItem("likedProducts") || "[]");
+    } catch {
+      return [];
+    }
+  });
+
+  // Fetch Wishlist from Backend (for logged-in users)
+  const fetchUserWishlist = useCallback(async () => {
+    if (!User?.userid) return;
+
+    try {
+      const res = await fetch(`${baseUrl}wishlist/${User.userid}`);
+      const data = await res.json();
+      if (res.ok && data.success) {
+        // Backend returns array of full product objects
+        // We only need IDs for the state to check likes quickly, 
+        // OR we can store objects. Let's store IDs for basic check and handle full list separately if needed.
+        // Actually, for "likedProducts" page we need full data. 
+        // Current pattern for "likedProducts" in category pages was "array of IDs".
+        // Let's stick to IDs for "likedProducts" state to keep context light, 
+        // but wait, the LikedProducts page needs data. 
+        // Let's store IDs here for the "heart icon" check, and fetch full wishlist on the specific page OR 
+        // store full objects here.
+        // Let's store IDs to match existing frontend logic in pages.
+        const likedIds = data.data.map(p => p.id);
+        setLikedProducts(likedIds);
+        localStorage.setItem("likedProducts", JSON.stringify(likedIds));
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist:", error);
+    }
+  }, [User, baseUrl]);
+
+  // Sync wishlist when user/auth changes
+  useEffect(() => {
+    if (isAuthentified && User?.userid) {
+      fetchUserWishlist();
+    } else {
+      // If logout, maybe clear specific user data or fallback to local
+      // For now, keep local as is or clear if desired. 
+      // decided: keep local for guest experience.
+    }
+  }, [isAuthentified, User, fetchUserWishlist]);
+
+
+  const handleToggleLike = async (productId) => {
+    const parsedId = parseInt(productId);
+    let updatedLikes;
+
+    // Optimistic Update
+    if (likedProducts.includes(parsedId)) {
+      updatedLikes = likedProducts.filter((id) => id !== parsedId);
+    } else {
+      updatedLikes = [...likedProducts, parsedId];
+    }
+    setLikedProducts(updatedLikes);
+    localStorage.setItem("likedProducts", JSON.stringify(updatedLikes));
+
+    // If Authenticated, Sync with Backend
+    if (isAuthentified && User?.userid) {
+      try {
+        await fetch(`${baseUrl}wishlist/toggle`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: User.userid,
+            productId: parsedId,
+          }),
+        });
+        // Optionally refetch to ensure sync
+      } catch (error) {
+        console.error("Error toggling like:", error);
+        toast.error("Failed to sync like");
+        // Revert on failure? For now, optimistic is fine.
+      }
+    }
+  };
+
   return (
     <ProductContext.Provider
       value={{
@@ -344,6 +428,8 @@ const ProductProvider = ({ children }) => {
         fetchUserCart,
         updateCartFromBackend,
         handleLogout,
+        likedProducts, // Exported State
+        handleToggleLike, // Exported Function
       }}
     >
       {children}
