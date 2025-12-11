@@ -9,16 +9,13 @@ import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
 import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
 import { FcLike } from "react-icons/fc";
+import { FaHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
 
 const Home = () => {
-  const { HandleGetProducts, productData, HandleAddTCart} = useContext(ProductContext);
+  const { HandleGetProducts, productData, HandleAddTCart, likedProducts, handleToggleLike } = useContext(ProductContext);
   
-
   // Progressive display for Best Sellers
   const [visibleCount, setVisibleCount] = useState(3);
-
-    // NEW: Track liked products
-  const [likedProducts, setLikedProducts] = useState([]);
 
   useEffect(() => {
     HandleGetProducts();
@@ -45,17 +42,6 @@ const Home = () => {
 
   const handleSeeLess = () => {
     setVisibleCount((prev) => Math.max(prev - 3, 3));
-  };
-
-  // NEW: Toggle like function
-  const handleToggleLike = (productId) => {
-    if (likedProducts.includes(productId)) {
-      // Remove from liked (unlike)
-      setLikedProducts(likedProducts.filter(id => id !== productId));
-    } else {
-      // Add to liked
-      setLikedProducts([...likedProducts, productId]);
-    }
   };
 
   return (
@@ -164,7 +150,7 @@ const Home = () => {
     {likedProducts.includes(item.id) ? (
       <FcLike className="h-5 w-5" />
     ) : (
-      <FaRegHeart className="h-5 w-5 text-primary" />
+      <FaHeart className="h-5 w-5 text-primary" />
     )}
   </span>
 
