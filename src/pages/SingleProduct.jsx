@@ -232,7 +232,8 @@ const SingleProduct = () => {
                 <div className="flex items-center border-2 border-gray-300 rounded-lg overflow-hidden">
                   <button
                     onClick={() => handleQuantityChange("decrease")}
-                    className="px-4 py-3 bg-white hover:bg-gray-100 transition-colors"
+                    disabled={product.quantity <= 0}
+                    className="px-4 py-3 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50"
                   >
                     <FaMinus className="text-gray-600" />
                   </button>
@@ -241,13 +242,14 @@ const SingleProduct = () => {
                   </span>
                   <button
                     onClick={() => handleQuantityChange("increase")}
-                    className="px-4 py-3 bg-white hover:bg-gray-100 transition-colors"
+                    disabled={product.quantity <= 0 || quantity >= product.quantity}
+                    className="px-4 py-3 bg-white hover:bg-gray-100 transition-colors disabled:opacity-50"
                   >
                     <FaPlus className="text-gray-600" />
                   </button>
                 </div>
-                <span className="text-sm text-gray-600">
-                  {product.stock || 10} items available
+                <span className={`text-sm ${product.quantity > 0 ? 'text-green-600' : 'text-red-600 font-bold'}`}>
+                  {product.quantity > 0 ? `${product.quantity} items available` : "Out of Stock"}
                 </span>
               </div>
             </div>
@@ -256,13 +258,18 @@ const SingleProduct = () => {
             <div className="space-y-3">
               <button onClick={(e)=>{
                 e.preventDefault()
-                HandleAddTCart(product, quantity, product?.size, product?.color)
+                if (product.quantity > 0) {
+                     HandleAddTCart(product, quantity, product?.size, product?.color)
+                }
               }} 
-              className="w-full bg-primary text-white py-4 rounded-lg font-bold text-lg hover:bg-primary transition-colors duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-3">
+              disabled={product.quantity <= 0}
+              className={`w-full text-white py-4 rounded-lg font-bold text-lg transition-colors duration-300 shadow-lg flex items-center justify-center gap-3 ${product.quantity > 0 ? 'bg-primary hover:bg-primary hover:shadow-xl' : 'bg-gray-400 cursor-not-allowed'}`}>
                 <FaShoppingCart className="w-5 h-5" />
-                Add to Cart
+                {product.quantity > 0 ? "Add to Cart" : "Out of Stock"}
               </button>
-              <button className="w-full bg-white text-primary py-4 rounded-lg font-bold text-lg border-2 border-primary hover:bg-gray-100 transition-colors duration-300 flex items-center justify-center gap-3">
+              <button 
+                  disabled={product.quantity <= 0}
+                  className={`w-full py-4 rounded-lg font-bold text-lg border-2 flex items-center justify-center gap-3 ${product.quantity > 0 ? 'bg-white text-primary border-primary hover:bg-gray-100' : 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'}`}>
                 Buy Now
               </button>
             </div>
