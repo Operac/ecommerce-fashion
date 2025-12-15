@@ -27,6 +27,7 @@ const SingleProduct = () => {
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
+  const [mainImage, setMainImage] = useState("");
 
   // Review State
   const [reviews, setReviews] = useState([]);
@@ -107,8 +108,21 @@ const SingleProduct = () => {
       setProduct(found);
       setSelectedColor(found?.defaultColor || "");
       setSelectedSize(found?.defaultSize || "");
+      setMainImage(found?.image || "");
     }
   }, [productData, id]);
+
+  useEffect(() => {
+    if (product && selectedColor) {
+      const variantImage = product.productImages?.find(img => img.color === selectedColor);
+      if (variantImage) {
+        setMainImage(variantImage.url);
+      } else {
+        // Fallback to main image if no variant image is found for this color
+        setMainImage(product.image);
+      }
+    }
+  }, [selectedColor, product]);
 
 
   const handleQuantityChange = (action) => {
@@ -157,7 +171,7 @@ const SingleProduct = () => {
           <div className="space-y-4">
             <div className="relative bg-white rounded-2xl overflow-hidden shadow-lg group">
               <img
-                src={product.image}
+                src={mainImage || product.image}
                 alt={product.name}
                 className="w-full h-[500px] object-cover group-hover:scale-105 transition-transform duration-700"
               />
