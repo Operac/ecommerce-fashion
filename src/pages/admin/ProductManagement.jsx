@@ -12,6 +12,9 @@ const ProductManagement = () => {
     const [totalItems, setTotalItems] = useState(0);
     const [limit] = useState(10);
     const [categories, setCategories] = useState([]);
+    const [subcategories, setSubcategories] = useState([]);
+    const [allTags, setAllTags] = useState([]);
+    const [newTag, setNewTag] = useState('');
     
     // Modal & Form States
     const [showAddModal, setShowAddModal] = useState(false);
@@ -20,39 +23,18 @@ const ProductManagement = () => {
     const [addFormData, setAddFormData] = useState({
         name: '', description: '', price: '', categoryid: '', quantity: '', currency: 'NGN',
         oldPrice: '', discount: 0, rating: 0, bestSelling: false, newArrival: false,
-        subcategory: '', defaultSize: '', defaultColor: '', sizes: '', colors: '', tags: ''
+        subcategory: '', defaultSize: '', defaultColor: '', sizes: '', colors: '', tags: []
     });
     const [editFormData, setEditFormData] = useState({});
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
-    }, [page]); // Re-fetch when page changes
+        fetchSubcategories();
+        fetchTags();
+    }, [page]); 
 
-    const fetchProducts = async () => {
-        setLoading(true);
-        try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`${baseUrl}getAllProducts?page=${page}&limit=${limit}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (data.success) {
-                setProducts(data.data || []);
-                if (data.pagination) {
-                    setTotalPages(data.pagination.totalPages);
-                    setTotalItems(data.pagination.totalItems);
-                }
-            } else {
-                toast.error(data.message || 'Failed to fetch products');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error fetching products');
-        } finally {
-            setLoading(false);
-        }
-    };
+    // ... fetchProducts ...
 
     const fetchCategories = async () => {
         try {
@@ -63,19 +45,59 @@ const ProductManagement = () => {
         } catch (error) { console.error(error); }
     };
 
+    const fetchSubcategories = async () => {
+        try {
+            const token = localStorage.getItem('token');
+             const res = await fetch(`${baseUrl}subcategory/getAll`, { headers: { Authorization: `Bearer ${token}` } });
+             const data = await res.json();
+             // Assuming structure matches others
+             if (data && Array.isArray(data)) setSubcategories(data); 
+             else if (data.success) setSubcategories(data.data || []);
+        } catch (error) { console.error(error); }
+    };
+
+    const fetchTags = async () => {
+        try {
+            const token = localStorage.getItem('token');
+             const res = await fetch(`${baseUrl}tag/getAll`, { headers: { Authorization: `Bearer ${token}` } });
+             const data = await res.json();
+             if (data && Array.isArray(data)) setAllTags(data);
+             else if (data.success) setAllTags(data.data || []);
+        } catch (error) { console.error(error); }
+    };
+
+    const handleCreateTag = async () => {
+        if (!newTag.trim()) return;
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${baseUrl}tag/create`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                body: JSON.stringify({ name: newTag })
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success('Tag created!');
+                setNewTag('');
+                fetchTags();
+            } else {
+                toast.error(data.message || 'Failed to create tag');
+            }
+        } catch (error) { console.error(error); toast.error('Error creating tag'); }
+    };
+
     // --- Delete Logic ---
     const handleDeleteProduct = async (id) => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
         try {
             const token = localStorage.getItem('token');
-            // FIX: Using ID here as fixed in backend
             const response = await fetch(`${baseUrl}deleteProduct/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });
             if (response.ok) {
                 toast.success('Product deleted successfully');
-                fetchProducts(); // Refresh list
+                fetchProducts(); 
             } else {
                 toast.error('Failed to delete product');
             }
@@ -103,6 +125,18 @@ const ProductManagement = () => {
         return str.split(',').map(item => item.trim()).filter(Boolean);
     };
 
+    // Handler for Arrays (Tags, etc)
+    const handleArrayToggle = (field, value) => {
+        setAddFormData(prev => {
+            const current = Array.isArray(prev[field]) ? prev[field] : [];
+            if (current.includes(value)) {
+                return { ...prev, [field]: current.filter(item => item !== value) };
+            } else {
+                return { ...prev, [field]: [...current, value] };
+            }
+        });
+    };
+
     const handleAddSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -118,7 +152,10 @@ const ProductManagement = () => {
             // Handle Arrays
             parseList(addFormData.sizes).forEach(s => formData.append('sizes', s));
             parseList(addFormData.colors).forEach(c => formData.append('colors', c));
-            parseList(addFormData.tags).forEach(t => formData.append('tags', t));
+            
+            // Tags is usually an array now
+            const finalTags = Array.isArray(addFormData.tags) ? addFormData.tags : parseList(addFormData.tags);
+            finalTags.forEach(t => formData.append('tags', t));
 
             if (addFormData.file) formData.append('image', addFormData.file);
 
@@ -132,7 +169,11 @@ const ProductManagement = () => {
             if (response.ok && data.success) {
                 toast.success('Product created successfully');
                 setShowAddModal(false);
-                setAddFormData({ name: '', description: '', price: '', categoryid: '', quantity: '', currency: 'NGN', sizes:'', colors:'', tags:'', isNew:false, bestSelling:false }); // Reset partial
+                setAddFormData({ 
+                    name: '', description: '', price: '', categoryid: '', quantity: '', currency: 'NGN',
+                    oldPrice: '', discount: 0, rating: 0, bestSelling: false, newArrival: false,
+                    subcategory: '', defaultSize: '', defaultColor: '', sizes: '', colors: '', tags: []
+                });
                 fetchProducts();
             } else {
                 toast.error(data.message || 'Failed to create product');
@@ -266,34 +307,86 @@ const ProductManagement = () => {
                         <form onSubmit={handleAddSubmit} className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {/* Basic Info */}
-                                <input name="name" placeholder="Product Name *" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="categoryid" type="number" placeholder="Category ID *" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="subcategory" placeholder="Subcategory" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="name" placeholder="Product Name *" value={addFormData.name} onChange={handleAddChange} required className="border p-2 rounded" />
+                                
+                                {/* Category Dropdown */}
+                                <select name="categoryid" value={addFormData.categoryid} onChange={handleAddChange} required className="border p-2 rounded">
+                                    <option value="">Select Category *</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
+
+                                {/* Subcategory Dropdown - Filtered */}
+                                <select name="subcategory" value={addFormData.subcategory} onChange={handleAddChange} className="border p-2 rounded">
+                                    <option value="">Select Subcategory</option>
+                                    {subcategories
+                                        .filter(sub => !addFormData.categoryid || sub.categoryId === parseInt(addFormData.categoryid))
+                                        .map(sub => (
+                                            <option key={sub.id} value={sub.name}>{sub.name}</option>
+                                        ))
+                                    }
+                                </select>
                                 
                                 {/* Pricing */}
-                                <input name="currency" placeholder="Currency (e.g. NGN)" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="price" type="number" placeholder="Price *" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="oldPrice" type="number" placeholder="Old Price" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="discount" type="number" placeholder="Discount %" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="currency" placeholder="Currency (e.g. NGN)" value={addFormData.currency} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="price" type="number" placeholder="Price *" value={addFormData.price} onChange={handleAddChange} required className="border p-2 rounded" />
+                                <input name="oldPrice" type="number" placeholder="Old Price" value={addFormData.oldPrice} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="discount" type="number" placeholder="Discount %" value={addFormData.discount} onChange={handleAddChange} className="border p-2 rounded" />
 
                                 {/* Inventory & Details */}
-                                <input name="quantity" type="number" placeholder="Quantity" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="defaultSize" placeholder="Default Size" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="defaultColor" placeholder="Default Color" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="rating" type="number" placeholder="Rating (0-5)" max="5" min="0" step="0.1" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="quantity" type="number" placeholder="Quantity" value={addFormData.quantity} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="defaultSize" placeholder="Default Size" value={addFormData.defaultSize} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="defaultColor" placeholder="Default Color" value={addFormData.defaultColor} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="rating" type="number" placeholder="Rating (0-5)" max="5" min="0" step="0.1" value={addFormData.rating} onChange={handleAddChange} className="border p-2 rounded" />
 
                                 {/* Lists */}
-                                <input name="sizes" placeholder="Sizes (S, M, L)" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="colors" placeholder="Colors (Red, Blue)" onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="tags" placeholder="Tags (summer, casual)" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="sizes" placeholder="Sizes (S, M, L)" value={addFormData.sizes} onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="colors" placeholder="Colors (Red, Blue)" value={addFormData.colors} onChange={handleAddChange} className="border p-2 rounded" />
+                                
+                                {/* Tags Management */}
+                                <div className="border p-2 rounded flex flex-col gap-2">
+                                    <label className="text-xs text-gray-500">Tags</label>
+                                    <div className="flex flex-wrap gap-1">
+                                        {Array.isArray(addFormData.tags) && addFormData.tags.map(tag => (
+                                            <span key={tag} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center">
+                                                {tag} 
+                                                <button type="button" onClick={() => handleArrayToggle('tags', tag)} className="ml-1 text-red-500 hover:text-red-700">&times;</button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <select 
+                                            className="border p-1 rounded text-sm flex-1"
+                                            onChange={(e) => {
+                                                if (e.target.value) handleArrayToggle('tags', e.target.value);
+                                                e.target.value = ""; // Reset select
+                                            }}
+                                        >
+                                            <option value="">Add existing tag...</option>
+                                            {allTags.map(t => (
+                                                <option key={t.id} value={t.name}>{t.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex gap-2 items-center">
+                                        <input 
+                                            placeholder="New tag name" 
+                                            value={newTag} 
+                                            onChange={(e) => setNewTag(e.target.value)}
+                                            className="border p-1 rounded text-sm flex-1"
+                                        />
+                                        <button type="button" onClick={handleCreateTag} className="bg-green-600 text-white px-2 py-1 rounded text-xs">Create</button>
+                                    </div>
+                                </div>
 
                                 {/* Booleans */}
                                 <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
-                                    <input type="checkbox" name="bestSelling" id="bestSelling" onChange={handleAddChange} />
+                                    <input type="checkbox" name="bestSelling" id="bestSelling" checked={addFormData.bestSelling} onChange={handleAddChange} />
                                     <label htmlFor="bestSelling" className="text-sm cursor-pointer select-none">Best Selling</label>
                                 </div>
                                 <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
-                                    <input type="checkbox" name="newArrival" id="newArrival" onChange={handleAddChange} />
+                                    <input type="checkbox" name="newArrival" id="newArrival" checked={addFormData.newArrival} onChange={handleAddChange} />
                                     <label htmlFor="newArrival" className="text-sm cursor-pointer select-none">New Arrival</label>
                                 </div>
                             </div>
