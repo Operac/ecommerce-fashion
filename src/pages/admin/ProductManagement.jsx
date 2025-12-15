@@ -264,18 +264,50 @@ const ProductManagement = () => {
                             <button onClick={() => setShowAddModal(false)} className="text-gray-500">&times;</button>
                         </div>
                         <form onSubmit={handleAddSubmit} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input name="name" placeholder="Product Name" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="price" type="number" placeholder="Price" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="categoryid" placeholder="Category ID" onChange={handleAddChange} required className="border p-2 rounded" />
-                                {/* In real app, Category should be a select dropdown mapped from categories state */}
-                                <input name="quantity" type="number" placeholder="Quantity" onChange={handleAddChange} required className="border p-2 rounded" />
-                                <input name="description" placeholder="Description" onChange={handleAddChange} className="border p-2 rounded md:col-span-2" />
-                                <input type="file" name="file" onChange={handleAddChange} className="border p-2 rounded md:col-span-2" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Basic Info */}
+                                <input name="name" placeholder="Product Name *" onChange={handleAddChange} required className="border p-2 rounded" />
+                                <input name="categoryid" type="number" placeholder="Category ID *" onChange={handleAddChange} required className="border p-2 rounded" />
+                                <input name="subcategory" placeholder="Subcategory" onChange={handleAddChange} className="border p-2 rounded" />
+                                
+                                {/* Pricing */}
+                                <input name="currency" placeholder="Currency (e.g. NGN)" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="price" type="number" placeholder="Price *" onChange={handleAddChange} required className="border p-2 rounded" />
+                                <input name="oldPrice" type="number" placeholder="Old Price" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="discount" type="number" placeholder="Discount %" onChange={handleAddChange} className="border p-2 rounded" />
+
+                                {/* Inventory & Details */}
+                                <input name="quantity" type="number" placeholder="Quantity" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="defaultSize" placeholder="Default Size" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="defaultColor" placeholder="Default Color" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="rating" type="number" placeholder="Rating (0-5)" max="5" min="0" step="0.1" onChange={handleAddChange} className="border p-2 rounded" />
+
+                                {/* Lists */}
+                                <input name="sizes" placeholder="Sizes (S, M, L)" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="colors" placeholder="Colors (Red, Blue)" onChange={handleAddChange} className="border p-2 rounded" />
+                                <input name="tags" placeholder="Tags (summer, casual)" onChange={handleAddChange} className="border p-2 rounded" />
+
+                                {/* Booleans */}
+                                <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                    <input type="checkbox" name="bestSelling" id="bestSelling" onChange={handleAddChange} />
+                                    <label htmlFor="bestSelling" className="text-sm cursor-pointer select-none">Best Selling</label>
+                                </div>
+                                <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                    <input type="checkbox" name="newArrival" id="newArrival" onChange={handleAddChange} />
+                                    <label htmlFor="newArrival" className="text-sm cursor-pointer select-none">New Arrival</label>
+                                </div>
                             </div>
+
+                            {/* Full Width Fields */}
+                            <textarea name="description" placeholder="Product Description" rows="3" onChange={handleAddChange} className="border p-2 rounded w-full" />
+                            <div className="border p-2 rounded w-full">
+                                <span className="block text-sm text-gray-500 mb-1">Product Image</span>
+                                <input type="file" name="file" onChange={handleAddChange} className="w-full" />
+                            </div>
+
                             <div className="flex justify-end gap-2 mt-4">
-                                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded">Save Product</button>
+                                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-medium">Save Product</button>
                             </div>
                         </form>
                     </div>
@@ -291,13 +323,30 @@ const ProductManagement = () => {
                             <button onClick={() => setShowEditModal(false)} className="text-gray-500">&times;</button>
                         </div>
                         <form onSubmit={handleEditSubmit} className="space-y-4">
-                            {/* Inputs similar to Add, prefilled */}
-                            <input name="name" value={editFormData.name || ''} onChange={handleEditChange} className="border p-2 rounded w-full" placeholder="Name" />
-                            <input name="price" type="number" value={editFormData.price || ''} onChange={handleEditChange} className="border p-2 rounded w-full" placeholder="Price" />
-                            <input name="quantity" type="number" value={editFormData.quantity || ''} onChange={handleEditChange} className="border p-2 rounded w-full" placeholder="Quantity" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <input name="name" value={editFormData.name || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Name" />
+                                <input name="price" type="number" value={editFormData.price || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Price" />
+                                <input name="oldPrice" type="number" value={editFormData.oldPrice || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Old Price" />
+                                <input name="discount" type="number" value={editFormData.discount || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Discount" />
+                                <input name="quantity" type="number" value={editFormData.quantity || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Quantity" />
+                                <input name="subcategory" value={editFormData.subcategory || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Subcategory" />
+                                <input name="sizes" value={editFormData.sizes || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Sizes (comma sep)" />
+                                <input name="colors" value={editFormData.colors || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Colors (comma sep)" />
+                                <input name="tags" value={editFormData.tags || ''} onChange={handleEditChange} className="border p-2 rounded" placeholder="Tags (comma sep)" />
+                                 <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                    <input type="checkbox" name="bestSelling" id="editBestSelling" checked={editFormData.bestSelling || false} onChange={handleEditChange} />
+                                    <label htmlFor="editBestSelling" className="text-sm cursor-pointer select-none">Best Selling</label>
+                                </div>
+                                <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                    <input type="checkbox" name="newArrival" id="editNewArrival" checked={editFormData.newArrival || false} onChange={handleEditChange} />
+                                    <label htmlFor="editNewArrival" className="text-sm cursor-pointer select-none">New Arrival</label>
+                                </div>
+                            </div>
+                            <textarea name="description" value={editFormData.description || ''} onChange={handleEditChange} rows="3" className="border p-2 rounded w-full" placeholder="Description" />
+                            
                             <div className="flex justify-end gap-2 mt-4">
-                                <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Update</button>
+                                <button type="button" onClick={() => setShowEditModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Update Product</button>
                             </div>
                         </form>
                     </div>

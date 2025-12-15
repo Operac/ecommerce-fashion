@@ -15,16 +15,82 @@ import { useParams } from "react-router-dom";import {
   FaPlus
 } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
+import { baseUrl } from "../Services/userService";
+import { toast } from "react-toastify";
 
 const SingleProduct = () => {
   const { id } = useParams();
-  const { productData, HandleGetProducts, HandleAddTCart } = useContext(ProductContext);
+  const { productData, HandleGetProducts, HandleAddTCart, User, token } = useContext(ProductContext);
   const [product, setProduct] = useState(null);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [liked, setLiked] = useState(false);
   const [activeTab, setActiveTab] = useState("description");
+
+  // Review State
+  const [reviews, setReviews] = useState([]);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState("");
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  // Fetch Reviews
+  useEffect(() => {
+    if (id) {
+      fetch(`${baseUrl}getReviews/${id}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            setReviews(data.data);
+          }
+        })
+        .catch((err) => console.error("Error fetching reviews:", err));
+    }
+  }, [id]);
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!token) {
+      toast.error("Please login to write a review");
+      return;
+    }
+    if (!newRating) {
+      toast.error("Please select a rating");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      const res = await fetch(`${baseUrl}createReview`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: token, // Pass token as is
+        },
+        body: JSON.stringify({
+          rating: newRating,
+          comment: newComment,
+          productId: id,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Review submitted successfully!");
+        setReviews([data.data, ...reviews]); // Prepend new review
+        setNewComment("");
+        setNewRating(5);
+        setShowReviewForm(false);
+      } else {
+        toast.error(data.message || "Failed to submit review");
+      }
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      toast.error("Something went wrong");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
  useEffect(() => {
     if (!productData?.length > 0) {
@@ -158,14 +224,23 @@ const SingleProduct = () => {
             {/* Price */}
             <div className="bg-white rounded-xl p-4">
               <div className="flex items-baseline gap-3">
-                <span className="text-4xl font-bold text-primary">
-                  ${product.price}
-                </span>
-                {product.oldPrice && (
-                  <span className="text-xl text-gray-400 line-through">
-                    ${product.oldPrice}
+                <div className="flex items-center gap-4">
+                  <span className="text-4xl font-bold text-primary">
+                    ${product.price}
                   </span>
-                )}
+                  {product.oldPrice && (
+                    <div className="flex flex-col">
+                      <span className="text-xl text-gray-400 line-through">
+                        ${product.oldPrice}
+                      </span>
+                      {product.discount > 0 && (
+                         <span className="text-sm font-bold text-red-500 bg-red-100 px-2 rounded-full">
+                           -{product.discount}%
+                         </span>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               <p className="text-sm text-gray-600 mt-2">
                 Tax included. Shipping calculated at checkout.
@@ -423,7 +498,7 @@ const SingleProduct = () => {
                   <div>
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-5xl font-bold text-primary">
-                        {product.rating || 4.5}
+                        {product.rating || (reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : "0.0")}
                       </span>
                       <div>
                         <div className="flex items-center gap-1">
@@ -431,37 +506,101 @@ const SingleProduct = () => {
                             <FaStar
                               key={i}
                               className={`w-5 h-5 ${
-                                i < Math.floor(product.rating || 4)
+                                i < Math.floor(product.rating || (reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length) : 0))
                                   ? "text-primary"
                                   : "text-gray-300"
                               }`}
                             />
                           ))}
                         </div>
-                        <p className="text-gray-600 text-sm">Based on {product.reviews || 128} reviews</p>
+                        <p className="text-gray-600 text-sm">Based on {reviews.length} reviews</p>
                       </div>
                     </div>
                   </div>
-                  <button className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary transition-colors">
-                    Write a Review
-                  </button>
+                  {!showReviewForm && (
+                    <button
+                      onClick={() => setShowReviewForm(true)}
+                      className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary transition-colors"
+                    >
+                      Write a Review
+                    </button>
+                  )}
                 </div>
 
+                {showReviewForm && (
+                    <form onSubmit={handleSubmitReview} className="bg-gray-50 p-6 rounded-lg border animate-fadeIn">
+                        <h3 className="font-bold text-lg mb-4">Write your review</h3>
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold mb-2">Rating</label>
+                            <div className="flex gap-2">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        type="button"
+                                        onClick={() => setNewRating(star)}
+                                        className="focus:outline-none"
+                                    >
+                                        <FaStar className={`w-6 h-6 ${star <= newRating ? "text-primary" : "text-gray-300"}`} />
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-semibold mb-2">Comment</label>
+                            <textarea 
+                                className="w-full p-3 border rounded-md focus:ring-2 focus:ring-primary focus:outline-none"
+                                rows="4"
+                                placeholder="Share your thoughts..."
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                required
+                            ></textarea>
+                        </div>
+                        <div className="flex gap-3">
+                            <button 
+                                type="submit" 
+                                disabled={submittingReview}
+                                className="px-6 py-2 bg-primary text-white rounded-lg font-semibold disabled:opacity-50"
+                            >
+                                {submittingReview ? "Submitting..." : "Submit Review"}
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={() => setShowReviewForm(false)}
+                                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                )}
+
                 <div className="space-y-4">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="border-b pb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        {[...Array(5)].map((_, j) => (
-                          <FaStar key={j} className="w-4 h-4 text-primary" />
-                        ))}
-                      </div>
-                      <p className="font-semibold mb-1">Great product!</p>
-                      <p className="text-gray-600 text-sm mb-2">
-                        Really happy with this purchase. The quality is excellent and fits perfectly.
-                      </p>
-                      <p className="text-gray-400 text-xs">John D. - 2 days ago</p>
-                    </div>
-                  ))}
+                  {reviews.length === 0 ? (
+                      <p className="text-gray-500 italic">No reviews yet. Be the first to review!</p>
+                  ) : (
+                      reviews.map((review) => (
+                        <div key={review.id} className="border-b pb-4">
+                          <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                {[...Array(5)].map((_, j) => (
+                                  <FaStar key={j} className={`w-4 h-4 ${j < review.rating ? "text-primary" : "text-gray-300"}`} />
+                                ))}
+                                <span className="font-semibold">{review.rating.toFixed(1)}</span>
+                              </div>
+                              <span className="text-gray-400 text-xs">
+                                  {new Date(review.createdAt).toLocaleDateString()}
+                              </span>
+                          </div>
+                          <p className="text-gray-600 text-sm mb-2">
+                            {review.comment}
+                          </p>
+                          <p className="text-gray-400 text-xs font-semibold">
+                              {review.user?.firstName ? `${review.user.firstName} ${review.user.lastName || ''}` : "Anonymous"}
+                          </p>
+                        </div>
+                      ))
+                  )}
                 </div>
               </div>
             )}

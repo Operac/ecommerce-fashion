@@ -267,9 +267,21 @@ const childrenProducts = useMemo(() => {
                       </p>
 
                       <div className="flex justify-between items-center mt-4">
-                        <span className="px-3 py-2 bg-primary text-white rounded-md font-bold text-lg">
-                          ${item.price}
-                        </span>
+                        <div className="flex flex-col">
+                          {item.discount > 0 && item.oldPrice ? (
+                             <div className="flex items-center gap-2">
+                                <span className="text-gray-400 line-through text-sm">
+                                  ${item.oldPrice}
+                                </span>
+                                <span className="text-xs font-bold text-red-500 bg-red-100 px-1 rounded">
+                                  -{item.discount}%
+                                </span>
+                             </div>
+                          ) : null}
+                          <span className="px-3 py-2 bg-primary text-white rounded-md font-bold text-lg w-fit">
+                            ${item.price}
+                          </span>
+                        </div>
                         <div className="flex gap-3">
                           <span
                             onClick={() => handleToggleLike(item.id)}
