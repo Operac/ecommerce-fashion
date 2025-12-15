@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { baseUrl } from '../../Services/userService';
 import { toast } from 'react-toastify';
 import { FaTrash, FaEye } from 'react-icons/fa';
-import AdminPagination from '../../components/AdminPagination';
+import AdminPagination from '../../Components/AdminPagination';
 
 const OrderManagement = () => {
     const [orders, setOrders] = useState([]);

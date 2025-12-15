@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { baseUrl } from '../../Services/userService';
 import { toast } from 'react-toastify';
 import { FaTrash, FaUserShield } from 'react-icons/fa';
-import AdminPagination from '../../components/AdminPagination';
+import AdminPagination from '../../Components/AdminPagination';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);

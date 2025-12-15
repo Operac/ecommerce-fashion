@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { baseUrl } from '../../Services/userService';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaSearch } from 'react-icons/fa';
-import AdminPagination from '../../components/AdminPagination';
+import AdminPagination from '../../Components/AdminPagination';
 
 const ProductManagement = () => {
     const [products, setProducts] = useState([]);
