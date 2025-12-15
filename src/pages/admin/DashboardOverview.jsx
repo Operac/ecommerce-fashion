@@ -35,9 +35,9 @@ const DashboardOverview = () => {
 
                 // Parallel fetch for overview data
                 const [productsRes, ordersRes, usersRes] = await Promise.all([
-                    fetch(`${baseUrl}product/getAllProducts?limit=1000`, { headers }), // Fetching all for accurate stats for now
-                    fetch(`${baseUrl}payment/getAllReceipts?limit=5`, { headers }), // Just get recent 5
-                    fetch(`${baseUrl}user/getAllUsers?limit=1`, { headers }) // Just need count ideally
+                    fetch(`${baseUrl}getAllProducts?limit=1000`, { headers }), // Fetching all for accurate stats for now
+                    fetch(`${baseUrl}getAllReceipts?limit=5`, { headers }), // Just get recent 5
+                    fetch(`${baseUrl}getAllUsers?limit=1`, { headers }) // Just need count ideally
                 ]);
 
                 const productsData = await productsRes.json();
