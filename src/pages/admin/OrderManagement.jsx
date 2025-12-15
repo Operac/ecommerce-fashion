@@ -19,7 +19,7 @@ const OrderManagement = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${baseUrl}payment/getAllReceipts?page=${page}&limit=10`, {
+            const res = await fetch(`${baseUrl}getAllReceipts?page=${page}&limit=10`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -41,7 +41,7 @@ const OrderManagement = () => {
     const handleUpdateStatus = async (id, status) => {
         try {
              const token = localStorage.getItem('token');
-             const res = await fetch(`${baseUrl}payment/updateReceiptStatus/${id}`, {
+             const res = await fetch(`${baseUrl}updateReceiptStatus/${id}`, {
                  method: 'PUT',
                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                  body: JSON.stringify({ status })
@@ -60,7 +60,7 @@ const OrderManagement = () => {
         if(!window.confirm("Delete this order?")) return;
         try {
              const token = localStorage.getItem('token');
-             const res = await fetch(`${baseUrl}payment/deleteReceipt/${id}`, {
+             const res = await fetch(`${baseUrl}deleteReceipt/${id}`, {
                  method: 'DELETE',
                  headers: { Authorization: `Bearer ${token}` }
              });

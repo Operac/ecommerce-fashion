@@ -19,7 +19,7 @@ const UserManagement = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${baseUrl}user/getAllUsers?page=${page}&limit=10`, {
+            const res = await fetch(`${baseUrl}getAllUsers?page=${page}&limit=10`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -42,7 +42,7 @@ const UserManagement = () => {
         if(!window.confirm("Delete this user?")) return;
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${baseUrl}user/deleteUser/${id}`, {
+            const res = await fetch(`${baseUrl}deleteUser/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });

@@ -33,7 +33,7 @@ const ProductManagement = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${baseUrl}product/getAllProducts?page=${page}&limit=${limit}`, {
+            const res = await fetch(`${baseUrl}getAllProducts?page=${page}&limit=${limit}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
@@ -57,7 +57,7 @@ const ProductManagement = () => {
     const fetchCategories = async () => {
         try {
             const token = localStorage.getItem('token');
-             const res = await fetch(`${baseUrl}category/getAllCategories`, { headers: { Authorization: `Bearer ${token}` } });
+             const res = await fetch(`${baseUrl}getAllCategories`, { headers: { Authorization: `Bearer ${token}` } });
              const data = await res.json();
              if (data.success) setCategories(data.data || []);
         } catch (error) { console.error(error); }
@@ -69,7 +69,7 @@ const ProductManagement = () => {
         try {
             const token = localStorage.getItem('token');
             // FIX: Using ID here as fixed in backend
-            const response = await fetch(`${baseUrl}product/deleteProduct/${id}`, {
+            const response = await fetch(`${baseUrl}deleteProduct/${id}`, {
                 method: 'DELETE',
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -122,7 +122,7 @@ const ProductManagement = () => {
 
             if (addFormData.file) formData.append('image', addFormData.file);
 
-            const response = await fetch(`${baseUrl}product/createProduct`, {
+            const response = await fetch(`${baseUrl}createProduct`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData
@@ -174,7 +174,7 @@ const ProductManagement = () => {
              // If we want to support image update, we need multipart form data for edit too. simpler to skip for now unless requested.
              delete payload.image; 
 
-             const response = await fetch(`${baseUrl}product/updateProduct/${editingProduct.id}`, {
+             const response = await fetch(`${baseUrl}updateProduct/${editingProduct.id}`, {
                  method: 'PUT',
                  headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
                  body: JSON.stringify(payload)
