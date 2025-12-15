@@ -34,7 +34,30 @@ const ProductManagement = () => {
         fetchTags();
     }, [page]); 
 
-    // ... fetchProducts ...
+    const fetchProducts = async () => {
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${baseUrl}getAllProducts?page=${page}&limit=${limit}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (data.success) {
+                setProducts(data.data || []);
+                if (data.pagination) {
+                    setTotalPages(data.pagination.totalPages);
+                    setTotalItems(data.pagination.totalItems);
+                }
+            } else {
+                toast.error(data.message || 'Failed to fetch products');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error fetching products');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const fetchCategories = async () => {
         try {
