@@ -153,7 +153,7 @@ const ProductProvider = ({ children }) => {
 
   const HandleGetProducts = useCallback(async () => {
     try {
-      const res = await fetch(`${baseUrl}getAllProducts`, {
+      const res = await fetch(`${baseUrl}getAllProducts?limit=1000`, {
         method: "GET",
       });
 
