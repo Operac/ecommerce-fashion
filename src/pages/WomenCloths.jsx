@@ -4,6 +4,7 @@ import { FaHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
+import { baseUrl } from "../Services/userService";
 
 const WomenCloths = () => {
   const { HandleGetProducts, productData, HandleAddTCart, likedProducts, handleToggleLike } = useContext(ProductContext);
@@ -13,6 +14,27 @@ const WomenCloths = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [selectedTag, setSelectedTag] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [dbSubcategories, setDbSubcategories] = useState([]);
+  const [dbTags, setDbTags] = useState([]);
+
+  useEffect(() => {
+    // Fetch Subcategories
+    fetch(`${baseUrl}subcategory/getAll`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) setDbSubcategories(data.data || []);
+        })
+        .catch(err => console.error("Error fetching subcategories", err));
+    
+    // Fetch Tags
+    fetch(`${baseUrl}tag/getAll`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) setDbTags(data.data || []);
+        })
+        .catch(err => console.error("Error fetching tags", err));
+  }, []);
 
   useEffect(() => {
     HandleGetProducts();
@@ -114,17 +136,14 @@ const womanProducts = useMemo(() => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white cursor-pointer"
                 >
                   <option value="all">All Categories</option>
-                  <option value="Sweaters">Sweaters</option>
-                  <option value="Jumpsuit">Jumpsuit</option>
-                  <option value="Outerwear">Outerwear</option>
-                  <option value="Dresses">Dresses</option>
-                  <option value="Activewear">Activewear</option>
-                  <option value="Skirts">Skirts</option>
-                  <option value="Tops">Tops</option>
-                  <option value="Jeans">Jeans</option>
-                  <option value="Jackets">Jackets</option>
-                  <option value="Pants">Pants</option>
-                  <option value="Accessories">Accessories</option>
+                  {dbSubcategories
+                    .filter(sub => {
+                        const catName = sub.category?.name?.toLowerCase();
+                        return catName === 'women' || catName === 'woman' || catName === 'female';
+                    })
+                    .map(sub => (
+                      <option key={sub.id} value={sub.name}>{sub.name}</option>
+                  ))}
                 </select>
               </div>
 
@@ -139,10 +158,9 @@ const womanProducts = useMemo(() => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white cursor-pointer"
                 >
                   <option value="all">All Styles</option>
-                  <option value="winter">winter</option>
-                  <option value="casual">casual</option>
-                  <option value="formal">formal</option>
-                  <option value="activewear">activewear</option>
+                  {dbTags.map(tag => (
+                      <option key={tag.id} value={tag.name}>{tag.name}</option>
+                  ))}
                 </select>
               </div>
 

@@ -14,7 +14,11 @@ import ProductProvider, { ProductContext } from './Context/ProductContext.jsx'
 import Login from './pages/Login.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
 import MenCloths from './pages/MenCloths.jsx'
-import AdminDashboard from './pages/AdminDashboard.jsx'
+import AdminLayout from './layouts/AdminLayout.jsx'
+import DashboardOverview from './pages/admin/DashboardOverview.jsx'
+import ProductManagement from './pages/admin/ProductManagement.jsx'
+import OrderManagement from './pages/admin/OrderManagement.jsx'
+import UserManagement from './pages/admin/UserManagement.jsx'
 import VerifyPayment from './pages/VerifyPayment.jsx'
 import ThankYou from './pages/ThankYou.jsx'
 import Orders from './pages/Orders.jsx'
@@ -69,8 +73,14 @@ const router = createBrowserRouter([
         path: "product/:id"
       },
       {
-        element: <AdminDashboard />,
-        path: "admin"
+        path: "admin",
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <DashboardOverview /> },
+          { path: "products", element: <ProductManagement /> },
+          { path: "orders", element: <OrderManagement /> },
+          { path: "users", element: <UserManagement /> }
+        ]
       },
             {
         element: <VerifyPayment />,

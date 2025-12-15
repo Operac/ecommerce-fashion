@@ -5,11 +5,11 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { IoArrowForwardCircle } from "react-icons/io5";
-import { FaHeart, FaRegHeart, FaShoppingCart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
 import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
 import { FcLike } from "react-icons/fc";
-import { FaHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
+
 
 const Home = () => {
   const { HandleGetProducts, productData, HandleAddTCart, likedProducts, handleToggleLike } = useContext(ProductContext);

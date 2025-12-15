@@ -284,7 +284,7 @@ const Cart = () => {
             <p className="text-2xl font-semibold">Loading</p>
             <PulseLoader color="#010101" />
           </div>
-        )}
+        )}
         <h1 className="text-3xl font-bold text-center mb-8">Your Cart</h1>
 
         <div

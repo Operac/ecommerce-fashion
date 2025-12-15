@@ -4,6 +4,7 @@ import { FaHeart, FaShoppingCart, FaSearch } from "react-icons/fa";
 import { FcLike } from "react-icons/fc";
 import Layout from "../Shared/Layout/Layout";
 import { ProductContext } from "../Context/ProductContext";
+import { baseUrl } from "../Services/userService";
 
 const MenCloths = () => {
   const { HandleGetProducts, productData, HandleAddTCart, likedProducts, handleToggleLike } = useContext(ProductContext);
@@ -13,6 +14,27 @@ const MenCloths = () => {
   const [selectedSubcategory, setSelectedSubcategory] = useState("all");
   const [selectedTag, setSelectedTag] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+
+  const [dbSubcategories, setDbSubcategories] = useState([]);
+  const [dbTags, setDbTags] = useState([]);
+
+  useEffect(() => {
+    // Fetch Subcategories
+    fetch(`${baseUrl}subcategory/getAll`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) setDbSubcategories(data.data || []);
+        })
+        .catch(err => console.error("Error fetching subcategories", err));
+    
+    // Fetch Tags
+    fetch(`${baseUrl}tag/getAll`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) setDbTags(data.data || []);
+        })
+        .catch(err => console.error("Error fetching tags", err));
+  }, []);
 
   useEffect(() => {
     HandleGetProducts();
@@ -116,10 +138,17 @@ const MenCloths = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white cursor-pointer"
                 >
                   <option value="all">All Categories</option>
-                  <option value="coat">Coat</option>
-                  <option value="shirt">Shirt</option>
-                  <option value="pant">Pant</option>
-                  <option value="shoe">Shoe</option>
+                  {dbSubcategories
+                    .filter(sub => {
+                        // Include if category matches or no category filter logic
+                        // Only show subcategories relevant to "Men" (or variations) or if they have no category specific logic in the schema for now they do.
+                        const catName = sub.category?.name?.toLowerCase();
+                        return catName === 'men' || catName === 'male';
+                    })
+                    .map(sub => (
+                      <option key={sub.id} value={sub.name}>{sub.name}</option>
+                  ))}
+                  {/* Fallback hardcoded if DB empty? No, better to rely on DB */}
                 </select>
               </div>
 
@@ -134,9 +163,9 @@ const MenCloths = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-primary transition-colors bg-white cursor-pointer"
                 >
                   <option value="all">All Styles</option>
-                  <option value="casual">Casual</option>
-                  <option value="lounge">Lounge</option>
-                  <option value="sports">Sports</option>
+                  {dbTags.map(tag => (
+                      <option key={tag.id} value={tag.name}>{tag.name}</option>
+                  ))}
                 </select>
               </div>
 
