@@ -26,6 +26,23 @@ const ProductManagement = () => {
         subcategory: '', defaultSize: '', defaultColor: '', sizes: '', colors: '', tags: []
     });
     const [editFormData, setEditFormData] = useState({});
+    
+    // Color Variants State
+    const [colorVariants, setColorVariants] = useState([{ id: Date.now(), color: '', file: null }]);
+
+    const addColorVariant = () => {
+        setColorVariants([...colorVariants, { id: Date.now(), color: '', file: null }]);
+    };
+
+    const removeVariant = (id) => {
+        setColorVariants(colorVariants.filter(v => v.id !== id));
+    };
+
+    const handleVariantChange = (index, field, value) => {
+        const updated = [...colorVariants];
+        updated[index][field] = value;
+        setColorVariants(updated);
+    };
 
     useEffect(() => {
         fetchProducts();
@@ -174,7 +191,17 @@ const ProductManagement = () => {
 
             // Handle Arrays
             parseList(addFormData.sizes).forEach(s => formData.append('sizes', s));
-            parseList(addFormData.colors).forEach(c => formData.append('colors', c));
+            
+            // Handle Color Variants
+            const colorNames = colorVariants.map(v => v.color).filter(Boolean);
+            colorNames.forEach(c => formData.append('colors', c));
+            
+            // Append Variant Images
+            colorVariants.forEach(v => {
+                if (v.color && v.file) {
+                    formData.append(`variant_image_${v.color}`, v.file);
+                }
+            });
             
             // Tags is usually an array now
             const finalTags = Array.isArray(addFormData.tags) ? addFormData.tags : parseList(addFormData.tags);
@@ -365,10 +392,42 @@ const ProductManagement = () => {
 
                                 {/* Lists */}
                                 <input name="sizes" placeholder="Sizes (S, M, L)" value={addFormData.sizes} onChange={handleAddChange} className="border p-2 rounded" />
-                                <input name="colors" placeholder="Colors (Red, Blue)" value={addFormData.colors} onChange={handleAddChange} className="border p-2 rounded" />
-                                
-                                {/* Tags Management */}
-                                <div className="border p-2 rounded flex flex-col gap-2">
+                            {/* Color Variants Section */}
+                            <div className="md:col-span-2 lg:col-span-3 border p-3 rounded bg-gray-50 flex flex-col gap-3">
+                                <label className="text-sm font-semibold text-gray-700">Color Variants & Images</label>
+                                <div className="space-y-2">
+                                    {colorVariants.map((variant, index) => (
+                                        <div key={variant.id} className="flex gap-2 items-center bg-white p-2 rounded border shadow-sm">
+                                            <input 
+                                                placeholder="Color Name (e.g. Red)" 
+                                                value={variant.color} 
+                                                onChange={(e) => handleVariantChange(index, 'color', e.target.value)}
+                                                className="border p-1 rounded text-sm flex-1"
+                                                required
+                                            />
+                                            <input 
+                                                type="file" 
+                                                accept="image/*"
+                                                onChange={(e) => handleVariantChange(index, 'file', e.target.files[0])}
+                                                className="text-xs w-48"
+                                            />
+                                            <button type="button" onClick={() => removeVariant(variant.id)} className="text-red-500 hover:text-red-700 p-1">
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button 
+                                        type="button" 
+                                        onClick={addColorVariant} 
+                                        className="text-sm text-indigo-600 font-medium flex items-center gap-1 hover:text-indigo-800"
+                                    >
+                                        <FaPlus /> Add Color Variant
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Tags Management */}
+                            <div className="border p-2 rounded flex flex-col gap-2">
                                     <label className="text-xs text-gray-500">Tags</label>
                                     <div className="flex flex-wrap gap-1">
                                         {Array.isArray(addFormData.tags) && addFormData.tags.map(tag => (
@@ -401,31 +460,31 @@ const ProductManagement = () => {
                                         />
                                         <button type="button" onClick={handleCreateTag} className="bg-green-600 text-white px-2 py-1 rounded text-xs">Create</button>
                                     </div>
-                                </div>
-
-                                {/* Booleans */}
-                                <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
-                                    <input type="checkbox" name="bestSelling" id="bestSelling" checked={addFormData.bestSelling} onChange={handleAddChange} />
-                                    <label htmlFor="bestSelling" className="text-sm cursor-pointer select-none">Best Selling</label>
-                                </div>
-                                <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
-                                    <input type="checkbox" name="newArrival" id="newArrival" checked={addFormData.newArrival} onChange={handleAddChange} />
-                                    <label htmlFor="newArrival" className="text-sm cursor-pointer select-none">New Arrival</label>
-                                </div>
                             </div>
 
-                            {/* Full Width Fields */}
-                            <textarea name="description" placeholder="Product Description" rows="3" onChange={handleAddChange} className="border p-2 rounded w-full" />
-                            <div className="border p-2 rounded w-full">
-                                <span className="block text-sm text-gray-500 mb-1">Product Image</span>
-                                <input type="file" name="file" onChange={handleAddChange} className="w-full" />
+                            {/* Booleans */}
+                            <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                <input type="checkbox" name="bestSelling" id="bestSelling" checked={addFormData.bestSelling} onChange={handleAddChange} />
+                                <label htmlFor="bestSelling" className="text-sm cursor-pointer select-none">Best Selling</label>
                             </div>
+                            <div className="flex items-center gap-2 border p-2 rounded bg-gray-50">
+                                <input type="checkbox" name="newArrival" id="newArrival" checked={addFormData.newArrival} onChange={handleAddChange} />
+                                <label htmlFor="newArrival" className="text-sm cursor-pointer select-none">New Arrival</label>
+                            </div>
+                        </div>
 
-                            <div className="flex justify-end gap-2 mt-4">
-                                <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
-                                <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-medium">Save Product</button>
-                            </div>
-                        </form>
+                        {/* Full Width Fields */}
+                        <textarea name="description" placeholder="Product Description" rows="3" onChange={handleAddChange} className="border p-2 rounded w-full mt-4" />
+                        <div className="border p-2 rounded w-full mt-4">
+                            <span className="block text-sm text-gray-500 mb-1">Product Main Image (Default)</span>
+                            <input type="file" name="file" onChange={handleAddChange} className="w-full" />
+                        </div>
+
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button type="button" onClick={() => setShowAddModal(false)} className="px-4 py-2 border rounded hover:bg-gray-100">Cancel</button>
+                            <button type="submit" className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 font-medium">Save Product</button>
+                        </div>
+                    </form>
                     </div>
                 </div>
             )}
