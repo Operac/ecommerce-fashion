@@ -108,9 +108,9 @@ const Search = () => {
                   >
                     {/* Image Container */}
                     <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
-                      {item.imageUrl ? (
+                      {item.image ? (
                         <img
-                          src={item.imageUrl[0]}
+                          src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                         />
