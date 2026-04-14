@@ -14,8 +14,8 @@ const Footer = () => {
             Find a location nearest you. <br />
             See our stores
           </p>
-          <p className="text-sm mt-3">+8801701253995</p>
-          <p className="text-sm text-gray-500">sujon.co@gmail.com</p>
+          <p className="text-sm mt-3">+2348166598665</p>
+          <p className="text-sm text-gray-500">afrikannapride@gmail.com</p>
         </div>
 
         {/* Column 2 */}
@@ -79,18 +79,8 @@ const Footer = () => {
       <div className="flex flex-col md:flex-row items-center justify-between mt-6 text-sm text-gray-500">
         <div className="flex space-x-3 mb-3 md:mb-0">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
-            alt="Visa"
-            className="h-5"
-          />
-          <img
             src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Mastercard_2019_logo.svg"
             alt="Mastercard"
-            className="h-5"
-          />
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Discover_Card_logo.svg"
-            alt="Discover"
             className="h-5"
           />
           <img
