@@ -1,6 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 
-export const baseUrl = "https://ecombackend-vl7q.onrender.com/";
+export const baseUrl = import.meta.env.VITE_API_URL;
 
 /**
  * Register a new user
