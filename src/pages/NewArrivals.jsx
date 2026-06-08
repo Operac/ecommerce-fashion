@@ -11,7 +11,7 @@ const NewArrivals = () => {
   const [likedProducts, setLikedProducts] = useState([]);
   const [visibleCount, setVisibleCount] = useState(12);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [sortBy, setSortBy] = useState("newArrival");
+  const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
     HandleGetProducts();
@@ -27,11 +27,11 @@ const NewArrivals = () => {
 
     // Filter by category if selected
     if (selectedCategory !== "all") {
-      filtered = filtered.filter((item) => item.category === selectedCategory);
+      filtered = filtered.filter((item) => item.category?.toLowerCase() === selectedCategory.toLowerCase());
     }
 
     // Sort products
-    if (sortBy === "newArrivals") {
+    if (sortBy === "newest") {
       // Assuming products have a dateAdded or id (higher id = newer)
       filtered = [...filtered].sort((a, b) => b.id - a.id);
     } else if (sortBy === "price-low") {
@@ -154,9 +154,9 @@ useEffect(() => {
                   Men
                 </button>
                 <button
-                  onClick={() => setSelectedCategory("woman")}
+                  onClick={() => setSelectedCategory("women")}
                   className={`px-4 py-2 rounded-full font-medium transition-all duration-300 ${
-                    selectedCategory === "woman"
+                    selectedCategory === "women"
                       ? "bg-primary text-white shadow-lg"
                       : "bg-white text-gray-700 hover:bg-gray-200"
                   }`}

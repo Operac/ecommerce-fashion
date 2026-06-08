@@ -14,6 +14,7 @@ import ProductProvider, { ProductContext } from './Context/ProductContext.jsx'
 import Login from './pages/Login.jsx'
 import SingleProduct from './pages/SingleProduct.jsx'
 import MenCloths from './pages/MenCloths.jsx'
+import Search from './pages/Search.jsx'
 import AdminLayout from './layouts/AdminLayout.jsx'
 import DashboardOverview from './pages/admin/DashboardOverview.jsx'
 import ProductManagement from './pages/admin/ProductManagement.jsx'
@@ -105,6 +106,10 @@ const router = createBrowserRouter([
       {
         element: <LikedProducts />,
         path: "liked-products"
+      },
+      {
+        element: <Search />,
+        path: "search"
       },
     ]
   }
