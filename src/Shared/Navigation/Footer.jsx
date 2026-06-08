@@ -22,10 +22,10 @@ const Footer = () => {
         <div>
           <h3 className="text-white font-semibold mb-4">Company</h3>
           <ul className="space-y-2 text-sm flex flex-col">
-            <li>Shop</li>
+            <NavLink to={"/newarrivals"}>Shop</NavLink>
             <NavLink to={"/login"}>Account</NavLink>
             <NavLink to={"/cart"}>Cart</NavLink>
-            <li>Checkout</li>
+            <NavLink to={"/cart"}>Checkout</NavLink>
           </ul>
         </div>
 
@@ -34,9 +34,9 @@ const Footer = () => {
           <h3 className="text-white font-semibold mb-4">Services</h3>
           <ul className="space-y-2 text-sm flex flex-col">
             <NavLink to={"/about"}>About us</NavLink>
-            <NavLink to={"/men"}>Men</NavLink>
-            <NavLink to={"/women"}>Women</NavLink>
-            <NavLink to={"/privacy-policy"}>Privacy policy</NavLink>
+            <NavLink to={"/mencloths"}>Men</NavLink>
+            <NavLink to={"/womencloths"}>Women</NavLink>
+            <NavLink to={"/about"}>Privacy policy</NavLink>
           </ul>
         </div>
 
