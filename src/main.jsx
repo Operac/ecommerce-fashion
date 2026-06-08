@@ -26,6 +26,7 @@ import Orders from './pages/Orders.jsx'
 import OrderHistory from './pages/OrderHistory.jsx'
 import VerifyEmail from './pages/VerifyEmail.jsx'
 import LikedProducts from './pages/LikedProducts.jsx'
+import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 
 
 const router = createBrowserRouter([
@@ -110,6 +111,10 @@ const router = createBrowserRouter([
       {
         element: <Search />,
         path: "search"
+      },
+      {
+        element: <PrivacyPolicy />,
+        path: "privacy-policy"
       },
     ]
   }
