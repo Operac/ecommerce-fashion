@@ -1,3 +1,6 @@
+const escapeHtml = (value) =>
+  String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
 export const generateInvoicePDF = (receipt, user) => {
   const invoiceHTML = `
     <!DOCTYPE html>
@@ -26,20 +29,20 @@ export const generateInvoicePDF = (receipt, user) => {
       <div class="header">
         <div class="company-name">E-Commerce Store</div>
         <div class="invoice-title">INVOICE</div>
-        <div>Invoice #${receipt.id} | Date: ${new Date(receipt.receiptDate).toLocaleDateString()}</div>
+        <div>Invoice #${escapeHtml(receipt.id)} | Date: ${escapeHtml(new Date(receipt.receiptDate).toLocaleDateString())}</div>
       </div>
 
       <div class="info-section">
         <div class="info-box">
           <h3>Bill To:</h3>
-          <p>${user?.email || 'Customer'}<br>
-          ${user?.phone || ''}<br>
-          ${user?.address || ''}</p>
+          <p>${escapeHtml(user?.email || 'Customer')}<br>
+          ${escapeHtml(user?.phone || '')}<br>
+          ${escapeHtml(user?.address || '')}</p>
         </div>
         <div class="info-box">
           <h3>Payment Details:</h3>
-          <p>Payment Reference: ${receipt.paymentReference}<br>
-          Payment Date: ${new Date(receipt.receiptDate).toLocaleDateString()}<br>
+          <p>Payment Reference: ${escapeHtml(receipt.paymentReference)}<br>
+          Payment Date: ${escapeHtml(new Date(receipt.receiptDate).toLocaleDateString())}<br>
           Payment Method: Credit Card</p>
         </div>
       </div>
@@ -57,22 +60,22 @@ export const generateInvoicePDF = (receipt, user) => {
           ${receipt.receiptItems.map(item => `
             <tr>
               <td>
-                ${item.product.name}
-                ${item.selectedSize ? `<br><small>Size: ${item.selectedSize}</small>` : ''}
-                ${item.selectedColor ? `<br><small>Color: ${item.selectedColor}</small>` : ''}
+                ${escapeHtml(item.product.name)}
+                ${item.selectedSize ? `<br><small>Size: ${escapeHtml(item.selectedSize)}</small>` : ''}
+                ${item.selectedColor ? `<br><small>Color: ${escapeHtml(item.selectedColor)}</small>` : ''}
               </td>
-              <td>${item.quantity}</td>
-              <td>$${item.unitPrice.toFixed(2)}</td>
-              <td>$${item.totalPrice.toFixed(2)}</td>
+              <td>${escapeHtml(item.quantity)}</td>
+              <td>$${escapeHtml(item.unitPrice.toFixed(2))}</td>
+              <td>$${escapeHtml(item.totalPrice.toFixed(2))}</td>
             </tr>
           `).join('')}
         </tbody>
       </table>
 
       <div class="total-section">
-        <div class="total-row">Subtotal: $${receipt.totalAmount.toFixed(2)}</div>
+        <div class="total-row">Subtotal: $${escapeHtml(receipt.totalAmount.toFixed(2))}</div>
         <div class="total-row">Shipping: Free</div>
-        <div class="total-row grand-total">Total: $${receipt.totalAmount.toFixed(2)}</div>
+        <div class="total-row grand-total">Total: $${escapeHtml(receipt.totalAmount.toFixed(2))}</div>
       </div>
 
       <div class="footer">

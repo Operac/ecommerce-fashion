@@ -261,10 +261,22 @@ const Cart = () => {
       if (res.ok) {
         console.log("data:", data);
         setIsLoading(false);
+        const paymentLink = data?.link;
+        try {
+          const { hostname } = new URL(paymentLink);
+          const allowed = ['checkout.flutterwave.com', 'ravemodal-prod.herokuapp.com', 'checkout.paystack.com', 'standard.paystack.co'];
+          if (!allowed.some(d => hostname === d || hostname.endsWith('.' + d))) {
+            throw new Error('Untrusted payment domain');
+          }
+        } catch {
+          toast.error("Invalid payment link received. Please try again.");
+          setIsLoading(false);
+          return;
+        }
         setTimeout(()=> {
           toast.success(data?.message);
         }, 3000);
-        window.location.href = data?.link;
+        window.location.href = paymentLink;
       } else {
         console.log("data:", data);
         setIsLoading(false);
